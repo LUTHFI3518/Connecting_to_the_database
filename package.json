@@ -1,0 +1,19 @@
+{
+  "dependencies": {
+    "better-sqlite3": "^13.0.2",
+    "express": "^5.2.1",
+    "swagger-ui-express": "^5.0.1"
+  },
+  "name": "task-api-sqlite",
+  "version": "1.0.0",
+  "description": "A simple CRUD API built with Node.js and Express.",
+  "main": "server.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "start": "node server.js"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "type": "commonjs"
+}
