@@ -91,15 +91,6 @@ app.get("/health", (req, res) => {
 app.put("/tasks/:id", (req, res) => {
 
     const taskId = Number(req.params.id);
-
-    const task = tasks.find(t => t.id === taskId);
-
-    if (!task) {
-        return res.status(404).json({
-            error: "Task not found"
-        });
-    }
-
     const { title, done } = req.body;
 
     if (!title || typeof done !== "boolean") {
@@ -108,27 +99,46 @@ app.put("/tasks/:id", (req, res) => {
         });
     }
 
-    task.title = title;
-    task.done = done;
+    const task = db.prepare(
+        "SELECT * FROM tasks WHERE id = ?"
+    ).get(taskId);
 
-    res.json(task);
-
-});
-app.delete("/tasks/:id", (req, res) => {
-    const taskId = Number(req.params.id);
-
-    const index = tasks.findIndex(t => t.id === taskId);
-
-    if (index === -1) {
+    if (!task) {
         return res.status(404).json({
             error: "Task not found"
         });
     }
-    tasks.splice(index, 1);
+
+    db.prepare(
+        "UPDATE tasks SET title = ?, done = ? WHERE id = ?"
+    ).run(title, done ? 1 : 0, taskId);
+
+    res.json({
+        id: taskId,
+        title,
+        done
+    });
+
+});
+app.delete("/tasks/:id", (req, res) => {
+
+    const taskId = Number(req.params.id);
+
+    const task = db.prepare(
+        "SELECT * FROM tasks WHERE id = ?"
+    ).get(taskId);
+
+    if (!task) {
+        return res.status(404).json({
+            error: "Task not found"
+        });
+    }
+
+    db.prepare(
+        "DELETE FROM tasks WHERE id = ?"
+    ).run(taskId);
 
     res.status(204).send();
-
-
 
 });
 app.listen(PORT, () => {
