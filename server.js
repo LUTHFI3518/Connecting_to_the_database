@@ -60,22 +60,27 @@ app.get("/tasks/:id", (req, res) => {
 
 });
 app.post("/tasks", (req, res) => {
-    console.log("POST route reached");
+
     const { title } = req.body;
+
     if (!title) {
         return res.status(400).json({
             error: "Title is required"
         });
     }
-    const newTask = {
-        id: tasks.length + 1,
+
+    const insert = db.prepare(
+        "INSERT INTO tasks (title, done) VALUES (?, ?)"
+    );
+
+    const result = insert.run(title, 0);
+
+    res.status(201).json({
+        id: result.lastInsertRowid,
         title: title,
         done: false
-    };
+    });
 
-    tasks.push(newTask);
-
-    res.status(201).json(newTask);
 });
 
 app.get("/health", (req, res) => {
